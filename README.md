@@ -93,6 +93,33 @@ ssh -p host-port myuser@localhost
 - `host-port` should match the port you specified when running the container.
 - Use the provided password or SSH key for authentication, depending on your configuration.
 
+### Deploy to Railway
+
+You can deploy this image directly to Railway using the button at the top of this README, or by visiting:
+
+- https://railway.app/new/template?templateUrl=https://github.com/aoudiamoncef/ubuntu-sshd
+
+On Railway, you will typically:
+
+1. Select this repository as the template.
+2. Configure the following environment variables:
+   - `SSH_USERNAME` – SSH username inside the container (default: `ubuntu`).
+   - `SSH_PASSWORD` – **required**, password for the SSH user.
+   - `AUTHORIZED_KEYS` – optional, contents of your `authorized_keys` file; if set, password authentication is disabled.
+   - `SSHD_CONFIG_ADDITIONAL` – optional, extra sshd configuration as a string.
+   - `SSHD_CONFIG_FILE` – optional, path to a file (inside the container) with additional sshd configuration.
+   - `ENABLE_SYSTEMD` – optional (`1` / `true`) to run systemd as PID 1 and enable full `systemctl` support. Note that Railway’s runtime may not expose full cgroup/systemd capabilities, so this mode is best-effort and primarily targeted at local or privileged Docker environments.
+
+3. Expose port `22` in your Railway service configuration and use the assigned TCP endpoint to connect via SSH.
+
+Example Railway SSH command (replace host and port with the values Railway gives you):
+
+```bash
+ssh -p <railway_port> SSH_USERNAME@<railway_host>
+```
+
+Use the configured password or your SSH key depending on your setup.
+
 ### Note
 
 - If the `AUTHORIZED_KEYS` environment variable is empty when starting the container, it will still launch the SSH server, but no authorized keys will be configured. You have to mount your own authorized keys file or manually configure the keys in the container.
