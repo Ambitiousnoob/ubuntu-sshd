@@ -3,22 +3,23 @@ FROM ubuntu:24.04
 
 # Set environment variables to avoid interactive prompts during installation
 ENV DEBIAN_FRONTEND=noninteractive
+ENV container=docker
 ENV SSH_USERNAME="ubuntu"
 ENV SSHD_CONFIG_ADDITIONAL=""
 
-# Install OpenSSH server, ensure it is updated, clean up, create directories, set permissions, and configure SSH
+# Install systemd and OpenSSH server, ensure OpenSSH is updated, clean up, create directories, set permissions, and configure SSH
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends iproute2 iputils-ping openssh-server telnet \
+    && apt-get install -y --no-install-recommends systemd systemd-sysv dbus iproute2 iputils-ping openssh-server telnet \
     && apt-get -y upgrade openssh-server \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
     && mkdir -p /run/sshd \
     && chmod 755 /run/sshd \
     && if ! id -u "$SSH_USERNAME" > /dev/null 2>&1; then useradd -ms /bin/bash "$SSH_USERNAME"; fi \
-    && chown -R "$SSH_USERNAME":"$SSH_USERNAME" /home/"$SSH_USERNAME" \
-    && chmod 755 /home/"$SSH_USERNAME" \
-    && mkdir -p /home/"$SSH_USERNAME"/.ssh \
-    && chown "$SSH_USERNAME":"$SSH_USERNAME" /home/"$SSH_USERNAME"/.ssh \
+    && chown -R "$SSH_USERNAME":"$SSH_USERNAME" /home/\"$SSH_USERNAME\" \
+    && chmod 755 /home/\"$SSH_USERNAME\" \
+    && mkdir -p /home/\"$SSH_USERNAME\"/.ssh \
+    && chown "$SSH_USERNAME":"$SSH_USERNAME" /home/\"$SSH_USERNAME\"/.ssh \
     && echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config \
     && echo "PermitRootLogin no" >> /etc/ssh/sshd_config
 
@@ -26,8 +27,12 @@ RUN apt-get update \
 COPY configure-ssh-user.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/configure-ssh-user.sh
 
+# Prepare cgroup mount for systemd
+VOLUME ["/sys/fs/cgroup"]
+STOPSIGNAL SIGRTMIN+3
+
 # Expose SSH port
 EXPOSE 22
 
-# Start SSH server
+# Run configuration script, which will hand over to systemd
 CMD ["/usr/local/bin/configure-ssh-user.sh"]
