@@ -132,6 +132,21 @@ However, Vercel’s platform is designed for HTTP-based, stateless workloads (se
 can bind port `22` and run long-lived SSH sessions. The Vercel button is mainly useful if you want to clone or adapt this
 project into a Vercel-compatible HTTP service, not to run an SSH daemon directly.
 
+### Deploy to Firebase (note)
+
+Firebase Hosting and Cloud Functions are also optimized for HTTP(S) and event-driven workloads. They do not provide a
+general-purpose Linux VM or container with exposed TCP ports like `22`, so you cannot run this SSHD-based Docker image
+_directly_ on Firebase as an SSH-accessible host.
+
+You **can**:
+
+- Use Firebase as a frontend or control panel (web UI, API) to manage metadata or configuration (e.g., which SSH hosts
+  to connect to).
+- Run this image on a compatible container platform (GCE, GKE, Cloud Run with TCP proxy in front, or any of the platforms
+  listed below) and have Firebase front it via HTTP APIs or act as a management plane.
+
+But you **cannot** use Firebase alone to expose port `22` for SSH.
+
 ### Deploy to other Docker-based platforms
 
 Because this image is a standard Ubuntu + SSHD Docker image, it can be deployed to many other platforms that support
