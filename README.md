@@ -3,6 +3,7 @@
 [![Docker Pulls](https://img.shields.io/docker/pulls/aoudiamoncef/ubuntu-sshd.svg)](https://hub.docker.com/r/aoudiamoncef/ubuntu-sshd)
 [![Maintenance](https://img.shields.io/badge/Maintained-Yes-green.svg)](https://github.com/aoudiamoncef/ubuntu-sshd)
 [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template?templateUrl=https://github.com/aoudiamoncef/ubuntu-sshd)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/aoudiamoncef/ubuntu-sshd)
 
 This Docker image provides an Ubuntu 24.04 base with SSH server enabled. It allows you to easily create SSH-accessible containers via SSH keys or with a default username and password.
 
@@ -119,6 +120,54 @@ ssh -p <railway_port> SSH_USERNAME@<railway_host>
 ```
 
 Use the configured password or your SSH key depending on your setup.
+
+### Deploy to Vercel (note)
+
+A Vercel deploy button is provided for convenience:
+
+- https://vercel.com/new/clone?repository-url=https://github.com/aoudiamoncef/ubuntu-sshd
+
+However, Vercel’s platform is designed for HTTP-based, stateless workloads (serverless functions and web apps), and does
+**not** expose a raw TCP port for SSH access. This repository is primarily intended for Docker-based environments where you
+can bind port `22` and run long-lived SSH sessions. The Vercel button is mainly useful if you want to clone or adapt this
+project into a Vercel-compatible HTTP service, not to run an SSH daemon directly.
+
+### Deploy to other Docker-based platforms
+
+Because this image is a standard Ubuntu + SSHD Docker image, it can be deployed to many other platforms that support
+long-lived Docker containers and TCP port binding, such as:
+
+- Render
+- Fly.io
+- DigitalOcean Apps / Droplets
+- AWS ECS / Fargate
+- Kubernetes clusters (GKE, AKS, EKS, etc.)
+- Plain Docker hosts or Swarm
+
+At a high level, you will:
+
+1. Build and push the image to a registry (e.g. Docker Hub, GHCR):
+
+   ```bash
+   docker build -t your-registry/ubuntu-sshd:latest .
+   docker push your-registry/ubuntu-sshd:latest
+   ```
+
+2. Create a service on your platform that uses the image and sets environment variables:
+   - `SSH_USERNAME`
+   - `SSH_PASSWORD`
+   - `AUTHORIZED_KEYS` (optional)
+   - `SSHD_CONFIG_ADDITIONAL` (optional)
+   - `SSHD_CONFIG_FILE` (optional)
+   - `ENABLE_SYSTEMD` (optional; requires a privileged / systemd-capable runtime)
+
+3. Expose container port `22` and map it to a public TCP port, then connect via SSH:
+
+   ```bash
+   ssh -p <public_port> SSH_USERNAME@<public_host>
+   ```
+
+Make sure your platform’s security groups / firewalls allow inbound TCP connections on the chosen SSH port.
 
 ### Note
 
