@@ -142,6 +142,7 @@ long-lived Docker containers and TCP port binding, such as:
 - DigitalOcean Apps / Droplets
 - AWS ECS / Fargate
 - Kubernetes clusters (GKE, AKS, EKS, etc.)
+- Red Hat OpenShift or other Red Hat-based Kubernetes distributions
 - Plain Docker hosts or Swarm
 
 At a high level, you will:
@@ -168,6 +169,110 @@ At a high level, you will:
    ```
 
 Make sure your platform’s security groups / firewalls allow inbound TCP connections on the chosen SSH port.
+
+#### Example: Render (Docker service)
+
+For Render, you typically:
+
+1. Push the image to a registry (or let Render build from this repo).
+2. Create a **Web Service** using the image or repo.
+3. Set environment variables in the Render dashboard:
+   - `SSH_USERNAME`
+   - `SSH_PASSWORD`
+   - `AUTHORIZED_KEYS` (optional)
+   - `SSHD_CONFIG_ADDITIONAL` / `SSHD_CONFIG_FILE` (optional)
+4. Expose port `22` as the service port. Render will give you a host and port; connect with:
+
+   ```bash
+   ssh -p <render_port> SSH_USERNAME@<render_host>
+   ```
+
+Systemd mode (`ENABLE_SYSTEMD=1`) may not be fully supported because Render does not run privileged containers with full cgroup access.
+
+#### Example: Fly.io
+
+For Fly.io, you can use a minimal `fly.toml`:
+
+```toml
+app = "ubuntu-sshd"
+
+[build]
+  image = "your-registry/ubuntu-sshd:latest"
+
+[[services]]
+  internal_port = 22
+  protocol = "tcp"
+
+  [[services.ports]]
+    handlers = ["tls"]
+    port = 2222
+```
+
+Then:
+
+```bash
+fly launch    # or fly deploy if app already exists
+fly secrets set SSH_USERNAME=myuser SSH_PASSWORD=mysecretpassword
+```
+
+Connect via:
+
+```bash
+ssh -p 2222 myuser@<your-app>.fly.dev
+```
+
+Fly.io also does not run with full systemd/cgroup privileges by default, so `ENABLE_SYSTEMD` is not recommended there.
+
+#### Example: Red Hat OpenShift / Red Hat-based Kubernetes
+
+On OpenShift or other Red Hat-based Kubernetes platforms, you typically run this image as a Deployment with a Service:
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ubuntu-sshd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ubuntu-sshd
+  template:
+    metadata:
+      labels:
+        app: ubuntu-sshd
+    spec:
+      containers:
+        - name: ubuntu-sshd
+          image: your-registry/ubuntu-sshd:latest
+          ports:
+            - containerPort: 22
+          env:
+            - name: SSH_USERNAME
+              value: "ubuntu"
+            - name: SSH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ubuntu-sshd-secret
+                  key: ssh_password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ubuntu-sshd
+spec:
+  type: LoadBalancer
+  selector:
+    app: ubuntu-sshd
+  ports:
+    - port: 22
+      targetPort: 22
+      protocol: TCP
+```
+
+- Create a Secret (`ubuntu-sshd-secret`) with `ssh_password` set.
+- OpenShift may impose security constraints (e.g. non-root UIDs, restricted SCCs). If needed, adjust the securityContext or SCC to allow this image to run `sshd` as required.
+- Systemd mode (`ENABLE_SYSTEMD`) usually requires privileged containers with host-level cgroup access and is generally **not recommended** on multi-tenant Kubernetes/OpenShift clusters.
 
 ### Note
 
