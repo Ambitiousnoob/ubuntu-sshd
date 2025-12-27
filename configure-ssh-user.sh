@@ -4,6 +4,7 @@
 : ${SSH_USERNAME:=ubuntu}
 : ${SSH_PASSWORD:?"Error: SSH_PASSWORD environment variable is not set."}
 : ${SSHD_CONFIG_ADDITIONAL:=""}
+: ${ENABLE_SYSTEMD:=}
 
 # Create the user with the provided username and set the password
 if id "$SSH_USERNAME" &>/dev/null; then
@@ -38,6 +39,13 @@ if [ -n "$SSHD_CONFIG_FILE" ] && [ -f "$SSHD_CONFIG_FILE" ]; then
     echo "Additional SSHD configuration from file applied"
 fi
 
-# Start systemd (which will manage the SSH service among others)
-echo "Starting systemd as PID 1..."
-exec /sbin/init
+
+
+# Start either systemd (for full systemctl support) or a standalone sshd
+if [ "$ENABLE_SYSTEMD" = "1" ] || [ "$ENABLE_SYSTEMD" = "true" ]; then
+    echo "Starting systemd as PID 1..."
+    exec /sbin/init
+else
+    echo "Starting SSH server..."
+    exec /usr/sbin/sshd -D
+fi

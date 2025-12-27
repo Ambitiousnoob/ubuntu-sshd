@@ -52,6 +52,35 @@ docker run -d \
   configuration. Replace `/path/to/your/sshd_config_file` with the path to your configuration file.
 - `my-ubuntu-sshd:latest` should be replaced with your Docker image's name and tag.
 
+### Running with systemd and systemctl (optional)
+
+This image can also run `systemd` as PID 1 inside the container, which enables full `systemctl` support. To use this mode,
+you must run the container with additional privileges and enable systemd via an environment variable:
+
+```bash
+docker run -d \
+  --privileged \
+  --cgroupns=host \
+  -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
+  -p host-port:22 \
+  -e SSH_USERNAME=myuser \
+  -e SSH_PASSWORD=mysecretpassword \
+  -e ENABLE_SYSTEMD=1 \
+  my-ubuntu-sshd:latest
+```
+
+In this mode:
+
+- `systemd` runs as PID 1 inside the container.
+- `openssh-server` is managed by `systemd` (via the `ssh` service).
+- The SSH user is added to the `sudo` group so you can run `systemctl` via `sudo`:
+
+```bash
+ssh -p host-port myuser@localhost
+sudo systemctl status ssh
+sudo systemctl restart ssh
+```
+
 ### SSH Access
 
 Once the container is running, you can SSH into it using the following command:
