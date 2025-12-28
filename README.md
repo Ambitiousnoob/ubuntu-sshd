@@ -1,8 +1,5 @@
-[![Docker Image CI](https://github.com/aoudiamoncef/ubuntu-sshd/actions/workflows/ci.yml/badge.svg)](https://github.com/aoudiamoncef/ubuntu-sshd/actions/workflows/ci.yml)
-[![Docker Image Deployment](https://github.com/aoudiamoncef/ubuntu-sshd/actions/workflows/cd.yml/badge.svg)](https://github.com/aoudiamoncef/ubuntu-sshd/actions/workflows/cd.yml)
-[![Docker Pulls](https://img.shields.io/docker/pulls/aoudiamoncef/ubuntu-sshd.svg)](https://hub.docker.com/r/aoudiamoncef/ubuntu-sshd)
-[![Maintenance](https://img.shields.io/badge/Maintained-Yes-green.svg)](https://github.com/aoudiamoncef/ubuntu-sshd)
 [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template?templateUrl=https://github.com/aoudiamoncef/ubuntu-sshd)
+[![Deploy to Red Hat OpenShift](https://img.shields.io/badge/Deploy%20to-OpenShift-red?logo=red-hat&logoColor=white)](https://www.redhat.com/en/technologies/cloud-computing/openshift)
 
 This Docker image provides an Ubuntu 24.04 base with SSH server enabled. It allows you to easily create SSH-accessible containers via SSH keys or with a default username and password.
 
@@ -10,12 +7,12 @@ This Docker image provides an Ubuntu 24.04 base with SSH server enabled. It allo
 
 ### Cloning the Repository
 
-To get started, clone the GitHub [repository](https://github.com/aoudiamoncef/ubuntu-sshd) containing the Dockerfile and
-scripts:
+To get started, clone the Git repository containing the Dockerfile and
+scripts (replace the URL with your own if you've forked or created a new repo):
 
 ```bash
-git clone https://github.com/aoudiamoncef/ubuntu-sshd
-cd ubuntu-sshd
+git clone https://github.com/your-username/your-repo.git
+cd your-repo
 ```
 
 ### Building the Docker Image
