@@ -28,7 +28,6 @@ COPY configure-ssh-user.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/configure-ssh-user.sh
 
 # Prepare cgroup mount for systemd
-VOLUME ["/sys/fs/cgroup"]
 STOPSIGNAL SIGRTMIN+3
 
 # Expose SSH port
