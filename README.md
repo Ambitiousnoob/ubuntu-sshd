@@ -1,4 +1,4 @@
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template?templateUrl=https://github.com/aoudiamoncef/ubuntu-sshd)
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template?templateUrl=https://github.com/Ambitiousnoob/ubuntu-sshd)
 [![Deploy to Red Hat OpenShift](https://img.shields.io/badge/Deploy%20to-OpenShift-red?logo=red-hat&logoColor=white)](https://www.redhat.com/en/technologies/cloud-computing/openshift)
 
 This Docker image provides an Ubuntu 24.04 base with SSH server enabled. It allows you to easily create SSH-accessible containers via SSH keys or with a default username and password.
@@ -94,7 +94,7 @@ ssh -p host-port myuser@localhost
 
 You can deploy this image directly to Railway using the button at the top of this README, or by visiting:
 
-- https://railway.app/new/template?templateUrl=https://github.com/aoudiamoncef/ubuntu-sshd
+- https://railway.app/new/template?templateUrl=https://github.com/Ambitiousnoob/ubuntu-sshd
 
 On Railway, you will typically:
 
