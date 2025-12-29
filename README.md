@@ -112,10 +112,22 @@ On Railway, you will typically:
 Example Railway SSH command (replace host and port with the values Railway gives you):
 
 ```bash
-ssh -p <railway_port> SSH_USERNAME@<railway_host>
+ssh -p &lt;railway_port&gt; SSH_USERNAME@&lt;railway_host&gt;
 ```
 
 Use the configured password or your SSH key depending on your setup.
+
+#### Preset variables for Railway
+
+This repository includes a `.env.example` file that defines the environment variable names used by the container (`SSH_USERNAME`, `SSH_PASSWORD`, `AUTHORIZED_KEYS`, `SSHD_CONFIG_ADDITIONAL`, `SSHD_CONFIG_FILE`, `ENABLE_SYSTEMD`).
+
+On Railway you can:
+
+1. Open your service's **Variables** tab.
+2. Click **RAW Editor** and paste the contents of `.env.example`, or use Railway’s `.env` import feature if it suggests it.
+3. Fill in the values (especially `SSH_PASSWORD` and/or `AUTHORIZED_KEYS`) and save.
+
+This makes it easier for users to create all required variables in one step.
 
 ### Note
 
