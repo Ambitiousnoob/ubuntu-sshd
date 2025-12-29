@@ -41,6 +41,18 @@ fi
 
 
 
+# If a PORT environment variable is provided (e.g. on Railway),
+# configure sshd to listen on that port instead of the default 22.
+if [ -n "$PORT" ] && [ "$PORT" != "22" ]; then
+    echo "Configuring SSHD to listen on port $PORT..."
+    # If a Port line exists, replace it; otherwise, append a new one.
+    if grep -qE '^[# ]*Port ' /etc/ssh/sshd_config; then
+        sed -i "s/^[# ]*Port .*/Port $PORT/" /etc/ssh/sshd_config
+    else
+        echo "Port $PORT" >> /etc/ssh/sshd_config
+    fi
+fi
+
 # Start either systemd (for full systemctl support) or a standalone sshd
 if [ "$ENABLE_SYSTEMD" = "1" ] || [ "$ENABLE_SYSTEMD" = "true" ]; then
     echo "Starting systemd as PID 1..."
